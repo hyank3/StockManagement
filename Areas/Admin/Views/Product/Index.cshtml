@@ -1,0 +1,100 @@
+﻿@model IEnumerable<ProductModel>
+@{
+    ViewData["Title"] = "List Product";
+    
+    // Phân trang
+    int pageSize = 10;
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int totalItems = ViewBag.TotalItems ?? 0;
+    int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+}
+
+<div class="text-center">
+    <h1 class="display-4">List Product</h1>
+    <a class="btn btn-primary" asp-controller="Product" asp-action="Create">Create Product</a>
+</div>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Mã sản phẩm</th>
+            <th scope="col">Tên sản phẩm</th>
+            <th scope="col">Đơn vị</th>
+            <th scope="col">Số lượng</th>
+            <th scope="col">Vị trí</th>
+            <th scope="col">Ghi chú</th>
+            <th scope="col">Ngày tạo</th>
+            <th scope="col">Ngày cập nhật</th>
+            <th scope="col">Quản lý</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null && Model.Any())
+        {
+            foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Id</td>
+                    <td>@item.ProductCode</td>
+                    <td>@item.ProductName</td>
+                    <td>@item.ProductUnit</td>
+                    <td>@item.ProductQuantity</td>
+                    <td>@item.Location</td>
+                    <td>@item.ProductDescription</td>
+                    <td>@item.CreateDate.ToString("dd/MM/yyyy HH:mm")</td>
+                    <td>@item.UpdateDate.ToString("dd/MM/yyyy HH:mm")</td>
+                    <td>
+                        <a class="btn btn-sm btn-primary" asp-action="Edit" asp-route-id="@item.Id">Edit</a>
+                        <form asp-action="Delete" asp-route-id="@item.Id" method="post" style="display:inline;" 
+                              onsubmit="return confirm('Bạn có chắc muốn xóa sản phẩm này?')">
+                            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="10" class="text-center">Không có dữ liệu</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- Phân trang -->
+@if (totalPages > 1)
+{
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            <!-- Previous -->
+            <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                <a class="page-link" 
+                   asp-action="Index" 
+                   asp-route-page="@(currentPage - 1)">Previous</a>
+            </li>
+
+            <!-- Page numbers -->
+            @for (int i = 1; i <= totalPages; i++)
+            {
+                <li class="page-item @(i == currentPage ? "active" : "")">
+                    <a class="page-link" 
+                       asp-action="Index" 
+                       asp-route-page="@i">@i</a>
+                </li>
+            }
+
+            <!-- Next -->
+            <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                <a class="page-link" 
+                   asp-action="Index" 
+                   asp-route-page="@(currentPage + 1)">Next</a>
+            </li>
+        </ul>
+    </nav>
+}
+
+<p class="text-center text-muted">
+    Hiển thị @Model.Count() / @totalItems sản phẩm - Trang @currentPage/@totalPages
+</p>
